@@ -1,6 +1,7 @@
 package com.varun.shopping.service.product;
 
-import com.varun.shopping.exception.ProductNotFoundException;
+import com.varun.shopping.exception.AlreadyExistsException;
+import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Category;
 import com.varun.shopping.model.Product;
 import com.varun.shopping.repository.CategoryRepository;
@@ -25,14 +26,17 @@ public class ProductService implements IProductService {
 
     @Override
     public Product getProductById(Integer id) {
-        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not Found with"));
+        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not Found with"));
     }
 
     @Override
     public Product addProduct(AddProductRequest request) {
-        // Check is the category exists
-        // If yes set it to the product
-        // If No, create the category and set it to the product
+        //Check if the Product with same name exists
+        List<Product> existingProduct = productRepository.findByName(request.getName());
+        if (!existingProduct.isEmpty()) {
+            throw new AlreadyExistsException("Product with name " + request.getName() + " already exists");
+        }
+        // Now Check is the category exists, YES add else create a new one
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
                     Category newCategory = new Category(request.getCategory().getName());
@@ -48,7 +52,7 @@ public class ProductService implements IProductService {
         return productRepository.findById(productId)
                 .map(existingProduct -> updateExistingProduct(existingProduct, request))
                 .map(productRepository::save)
-                .orElseThrow(() -> new ProductNotFoundException("Product not Found "));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not Found "));
     }
 
     @Override
