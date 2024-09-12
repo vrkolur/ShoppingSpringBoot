@@ -42,9 +42,9 @@ public class ImageService implements IImageService {
     }
 
     @Override
-    public ResponseEntity<String> saveImages(List<MultipartFile> files, Integer productId) {
+    public List<ImageDto> saveImages(List<MultipartFile> files, Integer productId) {
         Product product = productRepository.getProductById(productId);
-        List<ImageDto> imageDtos = new ArrayList<>();
+        List<ImageDto> savedImageDtos = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
                 Image image = new Image();
@@ -62,12 +62,12 @@ public class ImageService implements IImageService {
                 savedImage.setDownloadUrl(buildDownloadUrl + savedImage.getId());
                 // Save only if the ID changes and you need the final correct URL
                 imageRepository.save(savedImage);
-                imageDtos.add(new ImageDto(image.getId(), image.getFileName(), image.getDownloadUrl()));
+                savedImageDtos.add(new ImageDto(image.getId(), image.getFileName(), image.getDownloadUrl()));
             } catch (SQLException | IOException e) {
                 throw new RuntimeException(e.getMessage());
             }
         }
-        return ResponseEntity.ok(imageDtos.toString());
+        return savedImageDtos;
     }
 
     @Override
