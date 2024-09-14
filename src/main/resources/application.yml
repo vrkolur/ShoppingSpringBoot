@@ -11,6 +11,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        transaction:
+          coordinator_class: jdbc
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
