@@ -1,5 +1,6 @@
 package com.varun.shopping.controller;
 
+import com.varun.shopping.dto.ProductDto;
 import com.varun.shopping.exception.AlreadyExistsException;
 import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Product;
@@ -23,8 +24,13 @@ public class ProductController {
     // Get all products
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(new ApiResponse("Products fetched successfully", products));
+        try {
+            List<Product> products = productService.getAllProducts();
+            List<ProductDto> productDtoList = productService.getConvertedProducts(products);
+            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", productDtoList));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
     }
 
     // Get product by id
@@ -32,7 +38,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Integer id) {
         try {
             Product product = productService.getProductById(id);
-            return ResponseEntity.ok(new ApiResponse("Product fetched successfully", product));
+            ProductDto productDto = productService.getConvertedProducts(product);
+            return ResponseEntity.ok(new ApiResponse("Product fetched successfully", productDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -43,18 +50,21 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProductByCategory(@PathVariable String category) {
         try {
             List<Product> products = productService.getProductsByCategory(category);
-            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", products));
+            List<ProductDto> productDto = productService.getConvertedProducts(products);
+            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", productDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
+
 
     // Get product by name
     @GetMapping("/search/name/{name}")
     public ResponseEntity<ApiResponse> getProductByName(@PathVariable String name) {
         try {
             List<Product> products = productService.getProductsByName(name);
-            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", products));
+            List<ProductDto> productDtoList = productService.getConvertedProducts(products);
+            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", productDtoList));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -65,19 +75,20 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProductByBrand(@PathVariable String brand) {
         try {
             List<Product> products = productService.getProductsByBrand(brand);
-            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", products));
+            List<ProductDto> productDtoList = productService.getConvertedProducts(products);
+            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", productDtoList));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     // Get product by brand and name
-    // Try making the PathVariable as RequestParams
     @GetMapping("/search/{brand}/{name}")
-    public ResponseEntity<ApiResponse> getProductByBrandAndName(@PathVariable("brand") String brand, @PathVariable("name") String name) {
+    public ResponseEntity<ApiResponse> getProductsByCategoryAndBrand(@PathVariable("brand") String brand, @PathVariable("name") String name) {
         try {
             List<Product> products = productService.getProductsByCategoryAndBrand(brand, name);
-            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", products));
+            List<ProductDto> productDtoList = productService.getConvertedProducts(products);
+            return ResponseEntity.ok(new ApiResponse("Products fetched successfully", productDtoList));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -88,7 +99,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> addProduct(@RequestBody ProductRequest productBody) {
         try {
             Product product = productService.addProduct(productBody);
-            return ResponseEntity.ok(new ApiResponse("Product added successfully", product));
+            ProductDto productDto = productService.getConvertedProducts(product);
+            return ResponseEntity.ok(new ApiResponse("Product added successfully", productDto));
         } catch (AlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
@@ -99,7 +111,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable Integer id, @RequestBody ProductRequest productUpdateBody) {
         try {
             Product product = productService.updateProduct(productUpdateBody, id);
-            return ResponseEntity.ok(new ApiResponse("Product updated successfully", product));
+            ProductDto productDto = productService.getConvertedProducts(product);
+            return ResponseEntity.ok(new ApiResponse("Product updated successfully", productDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }

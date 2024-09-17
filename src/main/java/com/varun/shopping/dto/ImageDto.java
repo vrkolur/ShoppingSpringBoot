@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ImageDto {
-    private Integer id;
 
     private String name;
 

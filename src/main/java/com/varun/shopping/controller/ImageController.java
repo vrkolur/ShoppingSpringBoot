@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.sql.SQLException;
+
 import java.util.List;
 
 @RestController
@@ -34,29 +34,33 @@ public class ImageController {
             return ResponseEntity.ok(new ApiResponse("Images saved successfully", imageDtos));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse("Something went wrong: ",e.getMessage()));
+                    .body(new ApiResponse("Something went wrong: ", e.getMessage()));
         }
     }
 
-    @PostMapping("/download/{id}")
+    @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadImage(@PathVariable Integer id) {
         Image image = imageService.getImageById(id);
         try {
+            // Ensure proper byte array retrieval
             ByteArrayResource resource = new ByteArrayResource(image.getImage().getBytes(1, (int) image.getImage().length()));
+
+            // Set up the response entity with proper headers and content type
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(image.getFileType()))
+                    .contentType(MediaType.parseMediaType(image.getFileType()))  // Ensure media type matches file type
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + image.getFileName() + "\"")
                     .body(resource);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse> updateImage(@PathVariable Integer id, @RequestBody MultipartFile file) {
         Image image = imageService.getImageById(id);
         try {
-            if(image != null) {
+            if (image != null) {
                 imageService.updateImage(file, id);
                 return ResponseEntity.ok(new ApiResponse("Image updated successfully ", null));
             }
@@ -75,7 +79,6 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
-
 
 
 }

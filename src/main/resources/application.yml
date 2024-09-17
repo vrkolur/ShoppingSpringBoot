@@ -15,6 +15,10 @@ spring:
           coordinator_class: jdbc
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+#  servlet:
+#    multipart:
+#      max-file-size: 5MB
+#      max-request-size: 5MB
 
 api:
   prefix: /api/v1

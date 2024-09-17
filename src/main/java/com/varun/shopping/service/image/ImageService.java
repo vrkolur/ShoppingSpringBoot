@@ -34,11 +34,11 @@ public class ImageService implements IImageService {
 
     @Override
     public void deleteImageById(Integer id) {
-        imageRepository.findById(id)
-                .ifPresentOrElse(
-                        imageRepository::delete,
-                        () -> new ResourceNotFoundException("Image not found with id: " + id)
-                );
+        try {
+            imageRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Image not found with id: " + id);
+        }
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ImageService implements IImageService {
                 savedImage.setDownloadUrl(buildDownloadUrl + savedImage.getId());
                 // Save only if the ID changes and you need the final correct URL
                 imageRepository.save(savedImage);
-                savedImageDtos.add(new ImageDto(image.getId(), image.getFileName(), image.getDownloadUrl()));
+                savedImageDtos.add(new ImageDto( image.getFileName(), image.getDownloadUrl()));
             } catch (SQLException | IOException e) {
                 throw new RuntimeException(e.getMessage());
             }

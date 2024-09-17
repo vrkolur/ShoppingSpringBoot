@@ -59,8 +59,10 @@ public class CategoryService implements ICategoryService {
         if (existingCategory.isPresent()) {
             categoryRepository.deleteById(id);
             return ResponseEntity.ok("Category deleted successfully");
+        }else{
+            throw new ResourceNotFoundException("Category not found");
         }
-        return ResponseEntity.status(404).body("Category not found");
+
     }
 
 }

@@ -1,8 +1,11 @@
 package com.varun.shopping.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,8 +29,9 @@ public class Product {
 
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id", nullable = false)
+//    @JsonBackReference
     private Category category;
 
     private int inventory;
