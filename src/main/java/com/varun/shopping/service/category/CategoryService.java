@@ -1,10 +1,12 @@
 package com.varun.shopping.service.category;
 
+import com.varun.shopping.dto.CategoryDto;
 import com.varun.shopping.exception.AlreadyExistsException;
 import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Category;
 import com.varun.shopping.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,40 +19,43 @@ public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    private final ModelMapper modelMapper;
+
     @Override
     public Category getCategoryById(Integer id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not Found with"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 
     @Override
     public Category getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
+        return Optional.ofNullable(categoryRepository.findByName(name))
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: " + name));
     }
 
     @Override
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
+        if (categories.isEmpty()) throw new ResourceNotFoundException("Categories not found");
+        else return categories;
     }
 
     @Override
     public Category addCategory(Category category) {
         // Check if the category already exists
+        boolean exists = Optional.ofNullable(categoryRepository.findByName(category.getName())).isPresent();
         // Save the category
-        return Optional.of(category)
-                .map(categoryRepository::save)
-                .orElseThrow(() -> new AlreadyExistsException("Category already exists with name: " + category.getName()));
-
+        if (exists) throw new AlreadyExistsException("Category with name " + category.getName() + " already exists");
+        return categoryRepository.save(category);
     }
 
+
     @Override
-    public Category updateCategory(Category category, Integer id) {
+    public Category updateCategory(Integer id, String name) {
         // Only name is allowed to be updated, hence we will do it here only.
-        return Optional.ofNullable(getCategoryById(id))
-                .map(existingCategory -> {
-                    existingCategory.setName(category.getName());
-                    return categoryRepository.save(existingCategory);
-                }).orElseThrow(() -> new ResourceNotFoundException("Category not Found with"));
+        Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        existingCategory.setName(name);
+        return categoryRepository.save(existingCategory);
     }
 
     @Override
@@ -59,10 +64,26 @@ public class CategoryService implements ICategoryService {
         if (existingCategory.isPresent()) {
             categoryRepository.deleteById(id);
             return ResponseEntity.ok("Category deleted successfully");
-        }else{
+        } else {
             throw new ResourceNotFoundException("Category not found");
         }
 
+    }
+
+    @Override
+    public List<CategoryDto> convertToCategoryDto(List<Category> categories) {
+        return categories.stream().map(this::toCategoryDto).toList();
+    }
+
+    @Override
+    public CategoryDto convertToCategoryDto(Category category) {
+        return toCategoryDto(category);
+    }
+
+    // PRIVATE METHODS
+
+    private CategoryDto toCategoryDto(Category category) {
+        return modelMapper.map(category, CategoryDto.class);
     }
 
 }

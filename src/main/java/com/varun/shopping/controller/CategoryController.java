@@ -1,6 +1,7 @@
 package com.varun.shopping.controller;
 
 
+import com.varun.shopping.dto.CategoryDto;
 import com.varun.shopping.exception.AlreadyExistsException;
 import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Category;
@@ -24,9 +25,9 @@ public class CategoryController {
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllCategories() {
         try {
-            List<Category> categories = categoryService.getAllCategories();
-            return ResponseEntity.ok(new ApiResponse("Categories fetched successfully", categories));
-        } catch (ResourceNotFoundException e) {
+            List<CategoryDto> categoryDtosList = categoryService.convertToCategoryDto(categoryService.getAllCategories());
+            return ResponseEntity.ok(new ApiResponse("Categories fetched successfully", categoryDtosList));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
@@ -35,8 +36,8 @@ public class CategoryController {
     @GetMapping("/search/{id}")
     public ResponseEntity<ApiResponse> getCategoryById(@RequestBody Integer id) {
         try {
-            Category category = categoryService.getCategoryById(id);
-            return ResponseEntity.ok(new ApiResponse("Category fetched successfully", category));
+            CategoryDto categoryDtoList = categoryService.convertToCategoryDto(categoryService.getCategoryById(id));
+            return ResponseEntity.ok(new ApiResponse("Category fetched successfully", categoryDtoList));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -46,8 +47,8 @@ public class CategoryController {
     @GetMapping("/search/{name}")
     public ResponseEntity<ApiResponse> getCategoryByName(@RequestBody String name) {
         try {
-            Category category = categoryService.getCategoryByName(name);
-            return ResponseEntity.ok(new ApiResponse("Category fetched successfully", category));
+            CategoryDto categoryDto = categoryService.convertToCategoryDto(categoryService.getCategoryByName(name));
+            return ResponseEntity.ok(new ApiResponse("Category fetched successfully", categoryDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -55,10 +56,10 @@ public class CategoryController {
 
     // Add category
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addCategory(@RequestBody Category name) {
+    public ResponseEntity<ApiResponse> addCategory(@RequestBody Category category) {
         try {
-            Category category = categoryService.addCategory(name);
-            return ResponseEntity.ok(new ApiResponse("Category added successfully", category));
+            CategoryDto categoryDto = categoryService.convertToCategoryDto(categoryService.addCategory(category));
+            return ResponseEntity.ok(new ApiResponse("Category added successfully", categoryDto));
         } catch (AlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
@@ -77,14 +78,12 @@ public class CategoryController {
 
     // Update category
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(@PathVariable Integer id, @RequestBody Category category) {
+    public ResponseEntity<ApiResponse> updateCategory(@PathVariable Integer id, @RequestBody String name) {
         try {
-            Category updatedCategory = categoryService.updateCategory(category, id);
-            return ResponseEntity.ok(new ApiResponse("Category updated successfully", updatedCategory));
+            CategoryDto updatedCategoryDto = categoryService.convertToCategoryDto(categoryService.updateCategory(id, name));
+            return ResponseEntity.ok(new ApiResponse("Category updated successfully", updatedCategoryDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
-
-
 }
