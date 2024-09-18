@@ -31,7 +31,6 @@ public class Product {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", nullable = false)
-//    @JsonBackReference
     private Category category;
 
     private int inventory;

@@ -1,5 +1,6 @@
 package com.varun.shopping.service.category;
 
+import com.varun.shopping.dto.CategoryDto;
 import com.varun.shopping.model.Category;
 import org.springframework.http.ResponseEntity;
 
@@ -15,8 +16,12 @@ public interface ICategoryService {
 
     Category addCategory(Category category);
 
-    Category updateCategory(Category category, Integer id);
+    Category updateCategory(Integer id, String name);
 
     ResponseEntity<String> deleteCategoryById(Integer id);
+
+    CategoryDto convertToCategoryDto(Category category);
+
+    List<CategoryDto> convertToCategoryDto(List<Category> categories);
 
 }

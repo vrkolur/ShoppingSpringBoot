@@ -27,7 +27,7 @@ public class ProductService implements IProductService {
 
     private final CategoryRepository categoryRepository;
 
-    private  final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     private final ImageRepository imageRepository;
 
@@ -51,8 +51,8 @@ public class ProductService implements IProductService {
                 });
         request.setCategory(category);
         return productRepository.save(createProduct(request, category));
-
     }
+
 
     @Override
     public Product updateProduct(ProductRequest request, Integer productId) {
@@ -158,10 +158,10 @@ public class ProductService implements IProductService {
     // Convert Product to ProductDto
     private ProductDto convertToProductDto(Product product) {
         ProductDto productDto = modelMapper.map(product, ProductDto.class);
-        List<Image> images = imageRepository.findByProductId(product.getId());
-        List<ImageDto> imageDtos = images.stream()
-                .map(image -> modelMapper.map(image, ImageDto.class)).toList();
-        productDto.setImages(imageDtos);
+//        List<Image> images = imageRepository.findByProductId(product.getId());
+//        List<ImageDto> imageDtos = images.stream()
+//                .map(image -> modelMapper.map(image, ImageDto.class)).toList();
+//        productDto.setImages(imageDtos);
         return productDto;
     }
 
