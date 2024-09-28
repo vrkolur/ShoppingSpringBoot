@@ -27,7 +27,7 @@ public class Product {
 
     private String description;
 
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", nullable = false)
@@ -39,11 +39,11 @@ public class Product {
     private List<Image> images;
 
 
-    public Product(String name, String brand, String description, BigDecimal price, Category category, int inventory) {
+    public Product(String name, String brand, String description, BigDecimal unitPrice, Category category, int inventory) {
         this.name = name;
         this.brand = brand;
         this.description = description;
-        this.price = price;
+        this.unitPrice = unitPrice;
         this.category = category;
         this.inventory = inventory;
     }

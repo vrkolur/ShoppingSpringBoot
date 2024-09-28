@@ -148,7 +148,7 @@ public class ProductService implements IProductService {
         existinProduct.setName(request.getName());
         existinProduct.setBrand(request.getBrand());
         existinProduct.setDescription(request.getDescription());
-        existinProduct.setPrice(request.getPrice());
+        existinProduct.setUnitPrice(request.getPrice());
         existinProduct.setInventory(request.getInventory());
         Category category = categoryRepository.findByName(request.getCategory().getName());
         existinProduct.setCategory(category);
