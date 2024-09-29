@@ -29,14 +29,9 @@ public class CartItemService implements ICartItemService {
      * @param cartId    The ID of the shopping cart where the item is to be added or updated.
      * @param productId The ID of the product to be added or updated in the cart.
      * @param quantity  The quantity of the product to be added to the cart.
-     * @return ResponseEntity with a success message indicating whether the cart item was added or updated.
-     * <p>
-     * This method checks if the product already exists in the cart:
-     * - If the product exists, it updates the quantity and recalculates the total price.
-     * - If the product does not exist, a new CartItem is created and added to the cart.
      */
     @Override
-    public ResponseEntity<String> addCartItem(Integer cartId, Integer productId, Integer quantity) {
+    public void addCartItem(Integer cartId, Integer productId, Integer quantity) {
         Cart cart = cartService.getCartById(cartId);
         Product product = productService.getProductById(productId);
 
@@ -58,43 +53,36 @@ public class CartItemService implements ICartItemService {
         cartItem.setTotalPrice();
         cart.addCartItem(cartItem);
 
-        // Perform this before saving the cartItem, else the cartItem id will be generated.
-        String message = cartItem.getId() == null ? "Cart item added successfully" : "Cart item updated successfully";
-
         cartItemRepository.save(cartItem);
         cartRepository.save(cart);
-
-        return ResponseEntity.ok(message);
     }
 
 
     @Override
-    public ResponseEntity<String> updateCartItem(Integer cartId, Integer cartItemId, Integer quantity) {
+    public void updateCartItem(Integer cartId, Integer productId, Integer quantity) {
         Cart cart = cartService.getCartById(cartId);
         CartItem cartItem = cart.getCartItems()
                 .stream()
-                .filter(item -> item.getId().equals(cartItemId))
+                .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
         cartItem.setQuantity(quantity);
         cartItem.setUnitPrice(cartItem.getProduct().getUnitPrice());
         cartItem.setTotalPrice();
         cartRepository.save(cart);
-        return ResponseEntity.ok("Cart item updated successfully");
     }
 
     @Override
-    public ResponseEntity<String> deleteCartItem(Integer cartId, Integer cartItemId) {
+    public void deleteCartItem(Integer cartId, Integer productId) {
         Cart cart = cartService.getCartById(cartId);
         CartItem cartItem = cart.getCartItems()
                 .stream()
-                .filter(item -> item.getId().equals(cartItemId))
+                .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + productId));
         cart.removeCartItem(cartItem);
         cart.updateTotalAmount();
         cartItemRepository.delete(cartItem);
         cartRepository.save(cart);
-        return ResponseEntity.ok("Cart item deleted successfully");
     }
 }

@@ -33,8 +33,8 @@ public class CategoryController {
     }
 
     // Get category by id
-    @GetMapping("/search/{id}")
-    public ResponseEntity<ApiResponse> getCategoryById(@RequestBody Integer id) {
+    @GetMapping("/search/id/{id}")
+    public ResponseEntity<ApiResponse> getCategoryById(@PathVariable("id") Integer id) {
         try {
             CategoryDto categoryDtoList = categoryService.convertToCategoryDto(categoryService.getCategoryById(id));
             return ResponseEntity.ok(new ApiResponse("Category fetched successfully", categoryDtoList));
@@ -44,8 +44,8 @@ public class CategoryController {
     }
 
     // Get category by name
-    @GetMapping("/search/{name}")
-    public ResponseEntity<ApiResponse> getCategoryByName(@RequestBody String name) {
+    @GetMapping("/search/name/{name}")
+    public ResponseEntity<ApiResponse> getCategoryByName(@PathVariable String name) {
         try {
             CategoryDto categoryDto = categoryService.convertToCategoryDto(categoryService.getCategoryByName(name));
             return ResponseEntity.ok(new ApiResponse("Category fetched successfully", categoryDto));

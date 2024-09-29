@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +18,8 @@ public class CartService implements ICartService {
     private final CartRepository cartRepository;
 
     private final CartItemRepository cartItemRepository;
+
+    private final AtomicInteger cartIdGenerator = new AtomicInteger(0);
 
     @Override
     public Cart getCartById(Integer id) {
@@ -28,14 +31,14 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public ResponseEntity<String> clearCart(Integer id) {
+    public void clearCart(Integer id) {
 
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found with id: " + id));
         cartItemRepository.deleteAllByCartId(id);
         cart.getCartItems().clear();
         cartRepository.deleteById(id);
-        return ResponseEntity.ok("Cart cleared successfully");
+        ResponseEntity.ok("Cart cleared successfully");
     }
 
     @Override
@@ -48,5 +51,14 @@ public class CartService implements ICartService {
             }
             return unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+
+    @Override
+    public Integer initializeNewCart() {
+        Cart cart = new Cart();
+        cart.setId(cartIdGenerator.incrementAndGet());
+        cartRepository.save(cart);
+        return cart.getId();
     }
 }
