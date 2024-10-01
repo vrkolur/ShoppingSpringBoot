@@ -24,14 +24,14 @@ public class CartItemController {
                                                      @RequestParam Integer productId,
                                                      @RequestParam Integer quantity) {
         try {
-            if(cartId==null)
+            if(cartId==-1)
                 cartId = cartService.initializeNewCart();
             cartItemService.addCartItem(cartId, productId, quantity);
-        } catch (ResourceNotFoundException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(" ", e.getMessage()));
         }
-        return ResponseEntity.ok(new ApiResponse("Item added to cart successfully", null));
+        return ResponseEntity.ok(new ApiResponse("Item added to cart successfully", cartService.getCartById(cartId)));
     }
 
     @DeleteMapping("/delete")

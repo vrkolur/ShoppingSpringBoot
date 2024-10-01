@@ -11,7 +11,7 @@ public interface ICartService {
 
     void clearCart(Integer id);
 
-    BigDecimal getTotalAmount(Integer id);
+    BigDecimal getTotalPrice(Integer id);
 
     Integer initializeNewCart();
 }

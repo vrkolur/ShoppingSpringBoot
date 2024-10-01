@@ -47,4 +47,14 @@ public class Cart {
             return unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public BigDecimal getTotalAmount() {
+        return this.getCartItems().stream().map(cartItem -> {
+            BigDecimal unitPrice = cartItem.getUnitPrice();
+            if (unitPrice == null) {
+                return BigDecimal.ZERO;
+            }
+            return unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+        }).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }

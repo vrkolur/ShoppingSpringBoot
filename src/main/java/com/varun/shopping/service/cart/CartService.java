@@ -4,6 +4,7 @@ import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Cart;
 import com.varun.shopping.repository.CartItemRepository;
 import com.varun.shopping.repository.CartRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,11 @@ public class CartService implements ICartService {
     public Cart getCartById(Integer id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found with id: " + id));
-        BigDecimal totalAmount = getTotalAmount(cart.getId());
-        cart.setTotalAmount(totalAmount);
         return cartRepository.save(cart);
     }
 
     @Override
+    @Transactional
     public void clearCart(Integer id) {
 
         Cart cart = cartRepository.findById(id)
@@ -42,17 +42,10 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public BigDecimal getTotalAmount(Integer id) {
+    public BigDecimal getTotalPrice(Integer id) {
         Cart cart = getCartById(id);
-        return cart.getCartItems().stream().map(cartItem -> {
-            BigDecimal unitPrice = cartItem.getUnitPrice();
-            if (unitPrice == null) {
-                return BigDecimal.ZERO;
-            }
-            return unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-        }).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return cart.getTotalAmount();
     }
-
 
     @Override
     public Integer initializeNewCart() {

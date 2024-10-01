@@ -19,7 +19,7 @@ public class ProductDto {
 
     private String description;
 
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
     private CategoryDto category;
 

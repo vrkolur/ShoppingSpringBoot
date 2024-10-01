@@ -137,7 +137,7 @@ public class ProductService implements IProductService {
                 request.getName(),
                 request.getBrand(),
                 request.getDescription(),
-                request.getPrice(),
+                request.getUnitPrice(),
                 category,
                 request.getInventory()
         );
@@ -148,7 +148,7 @@ public class ProductService implements IProductService {
         existinProduct.setName(request.getName());
         existinProduct.setBrand(request.getBrand());
         existinProduct.setDescription(request.getDescription());
-        existinProduct.setUnitPrice(request.getPrice());
+        existinProduct.setUnitPrice(request.getUnitPrice());
         existinProduct.setInventory(request.getInventory());
         Category category = categoryRepository.findByName(request.getCategory().getName());
         existinProduct.setCategory(category);
