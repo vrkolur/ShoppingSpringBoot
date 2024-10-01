@@ -40,15 +40,15 @@ public class CartController {
         return ResponseEntity.ok(new ApiResponse("Cart cleared successfully", cart));
     }
 
-    @GetMapping("/total/{id}")
-    public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable Integer id) {
+    @GetMapping("/total/{cartId}")
+    public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable Integer cartId) {
         BigDecimal totalAmount = null;
         try {
-            totalAmount = cartService.getTotalAmount(id);
+            totalAmount = cartService.getTotalPrice(cartId);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Cart fetched successfully", totalAmount));
+        return ResponseEntity.ok(new ApiResponse("Cart total amount fetched successfully", totalAmount));
     }
 
 
