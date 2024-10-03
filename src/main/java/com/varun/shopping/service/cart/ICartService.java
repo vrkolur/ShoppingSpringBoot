@@ -9,6 +9,8 @@ public interface ICartService {
 
     Cart getCartById(Integer id);
 
+    Cart getCartByUserId(Integer userId);
+
     void clearCart(Integer id);
 
     BigDecimal getTotalPrice(Integer id);

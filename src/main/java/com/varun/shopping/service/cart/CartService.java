@@ -30,6 +30,13 @@ public class CartService implements ICartService {
     }
 
     @Override
+    public Cart getCartByUserId(Integer userId) {
+        Cart cart  = cartRepository.findByUserId(userId);
+        if(cart!=null) return cart;
+        else throw  new ResourceNotFoundException("Cart not found with userId: " + userId);
+    }
+
+    @Override
     @Transactional
     public void clearCart(Integer id) {
 
