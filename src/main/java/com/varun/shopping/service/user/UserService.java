@@ -9,8 +9,6 @@ import com.varun.shopping.request.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
@@ -25,16 +23,9 @@ public class UserService implements IUserService {
 
     @Override
     public User createUser(CreateUserRequest request) {
-        return Optional.of(request)
-                .filter(user -> !userRepository.existsByEmail(user.getEmail()))
-                .map(req -> {
-                    User user = new User();
-                    user.setFirstName(request.getFirstName());
-                    user.setLastName(request.getLastName());
-                    user.setEmail(request.getEmail());
-                    user.setPassword(request.getPassword());
-                    return userRepository.save(user);
-                }).orElseThrow(() -> new AlreadyExistsException("User already exists with email: " + request.getEmail()));
+        if (userRepository.existsByEmail(request.getEmail()))
+            throw new AlreadyExistsException("User already exists with email: " + request.getEmail());
+        return userRepository.save(mapRequestToUser(request));
     }
 
     @Override
@@ -53,4 +44,16 @@ public class UserService implements IUserService {
                     throw new ResourceNotFoundException("User not found with userId: " + userId);
                 });
     }
+
+    // PRIVATE METHODS
+
+    private User mapRequestToUser(CreateUserRequest request) {
+        User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        return user;
+    }
+
 }
