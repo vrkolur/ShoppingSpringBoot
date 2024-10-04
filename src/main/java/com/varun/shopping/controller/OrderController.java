@@ -1,7 +1,7 @@
 package com.varun.shopping.controller;
 
+import com.varun.shopping.dto.OrderDto;
 import com.varun.shopping.exception.ResourceNotFoundException;
-import com.varun.shopping.model.Order;
 import com.varun.shopping.response.ApiResponse;
 import com.varun.shopping.service.order.IOrderService;
 import lombok.RequiredArgsConstructor;
@@ -20,35 +20,35 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createOrder(Integer userId) {
-        Order order = null;
+        OrderDto orderDto = null;
         try {
-            order = orderService.placeOrder(userId);
+            orderDto = orderService.placeOrder(userId);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Order created successfully", order));
+        return ResponseEntity.ok(new ApiResponse("Order created successfully", orderDto));
     }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse> getOrderById(@PathVariable Integer orderId) {
-        Order order = null;
+        OrderDto orderDto = null;
         try {
-            order = orderService.getOrderById(orderId);
+            orderDto = orderService.getOrderById(orderId);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Order fetched successfully", order));
+        return ResponseEntity.ok(new ApiResponse("Order fetched successfully", orderId));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Integer userId) {
-        List<Order> orders = null;
+        List<OrderDto> orderDtoList = null;
         try {
-            orders = orderService.getUserOrders(userId);
+            orderDtoList = orderService.getUserOrders(userId);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Orders fetched successfully", orders));
+        return ResponseEntity.ok(new ApiResponse("Orders fetched successfully", orderDtoList));
     }
 
 }

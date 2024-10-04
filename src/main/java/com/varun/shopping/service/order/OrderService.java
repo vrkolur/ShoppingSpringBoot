@@ -1,5 +1,7 @@
 package com.varun.shopping.service.order;
 
+import com.varun.shopping.dto.OrderDto;
+import com.varun.shopping.dto.OrderItemDto;
 import com.varun.shopping.enums.OrderStatus;
 import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Cart;
@@ -10,6 +12,7 @@ import com.varun.shopping.repository.OrderRepository;
 import com.varun.shopping.repository.ProductRepository;
 import com.varun.shopping.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,25 +30,30 @@ public class OrderService implements IOrderService {
 
     private final CartService cartService;
 
+    private final ModelMapper modelMapper;
+
 
     @Override
-    public Order placeOrder(Integer userId) {
+    public OrderDto placeOrder(Integer userId) {
         Cart cart = cartService.getCartByUserId(userId);
         Order order = prepareOrder(cart);
-        return saveOrderWithItems(order, cart);
+        return convertToOrderDto(saveOrderWithItems(order, cart));
     }
 
 
     @Override
-    public Order getOrderById(Integer id) {
+    public OrderDto getOrderById(Integer id) {
         return orderRepository.findById(id)
+                .map(this::convertToOrderDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
     }
 
     @Override
-    public List<Order> getUserOrders(Integer userId) {
+    public List<OrderDto> getUserOrders(Integer userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
-        if (!orders.isEmpty()) return orders;
+        if (!orders.isEmpty()) {
+            return orders.stream().map(this::convertToOrderDto).toList();
+        }
         else throw new ResourceNotFoundException("Orders not found with userId: " + userId);
     }
 
@@ -87,6 +95,10 @@ public class OrderService implements IOrderService {
             productRepository.save(product);
             return new OrderItem(order, product, cartItem.getQuantity(), cartItem.getUnitPrice(), cartItem.getTotalPrice());
         }).toList();
+    }
+
+    private OrderDto convertToOrderDto(Order order) {
+        return modelMapper.map(order, OrderDto.class);
     }
 
 
