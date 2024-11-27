@@ -1,5 +1,6 @@
 package com.varun.shopping.service.user;
 
+import com.varun.shopping.dto.UserDto;
 import com.varun.shopping.exception.AlreadyExistsException;
 import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.User;
@@ -7,6 +8,7 @@ import com.varun.shopping.repository.UserRepository;
 import com.varun.shopping.request.CreateUserRequest;
 import com.varun.shopping.request.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+
+    private final ModelMapper modelMapper;
 
     @Override
     public User getUserById(Integer userId) {
@@ -45,6 +49,11 @@ public class UserService implements IUserService {
                 });
     }
 
+    @Override
+    public UserDto mapUserToUserDto(User user) {
+        return modelMapper.map(user, UserDto.class);
+    }
+
     // PRIVATE METHODS
 
     private User mapRequestToUser(CreateUserRequest request) {
@@ -55,5 +64,6 @@ public class UserService implements IUserService {
         user.setPassword(request.getPassword());
         return user;
     }
+
 
 }

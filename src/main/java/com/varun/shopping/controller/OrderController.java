@@ -20,35 +20,32 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createOrder(Integer userId) {
-        OrderDto orderDto = null;
         try {
-            orderDto = orderService.placeOrder(userId);
+            OrderDto orderDto = orderService.placeOrder(userId);
+            return ResponseEntity.ok(new ApiResponse("Order created successfully", orderDto));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Order created successfully", orderDto));
     }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse> getOrderById(@PathVariable Integer orderId) {
-        OrderDto orderDto = null;
         try {
-            orderDto = orderService.getOrderById(orderId);
+            OrderDto orderDto = orderService.getOrderById(orderId);
+            return ResponseEntity.ok(new ApiResponse("Order fetched successfully", orderDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Order fetched successfully", orderId));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Integer userId) {
-        List<OrderDto> orderDtoList = null;
         try {
-            orderDtoList = orderService.getUserOrders(userId);
+            List<OrderDto> orderDtoList = orderService.getUserOrders(userId);
+            return ResponseEntity.ok(new ApiResponse("Orders fetched successfully", orderDtoList));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
-        return ResponseEntity.ok(new ApiResponse("Orders fetched successfully", orderDtoList));
     }
 
 }

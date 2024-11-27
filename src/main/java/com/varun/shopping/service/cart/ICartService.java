@@ -1,6 +1,8 @@
 package com.varun.shopping.service.cart;
 
+import com.varun.shopping.dto.CartDto;
 import com.varun.shopping.model.Cart;
+import com.varun.shopping.model.User;
 
 import java.math.BigDecimal;
 
@@ -15,5 +17,7 @@ public interface ICartService {
 
     BigDecimal getTotalPrice(Integer id);
 
-    Integer initializeNewCart();
+    Cart initializeNewCart(User user);
+
+    CartDto mapCartToCartDto(Cart cart);
 }

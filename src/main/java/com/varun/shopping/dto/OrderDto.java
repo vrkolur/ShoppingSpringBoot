@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 public class OrderDto {
 
     private Integer id;
@@ -22,6 +21,6 @@ public class OrderDto {
 
     private OrderStatus orderStatus;
 
-    private List<OrderItemDto> items;
+    private List<OrderItemDto> orderItemDtoList;
 
 }

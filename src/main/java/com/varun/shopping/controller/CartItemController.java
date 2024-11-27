@@ -1,10 +1,12 @@
 package com.varun.shopping.controller;
 
 import com.varun.shopping.exception.ResourceNotFoundException;
-import com.varun.shopping.model.CartItem;
+import com.varun.shopping.model.Cart;
+import com.varun.shopping.model.User;
 import com.varun.shopping.response.ApiResponse;
 import com.varun.shopping.service.cart.ICartItemService;
 import com.varun.shopping.service.cart.ICartService;
+import com.varun.shopping.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +21,19 @@ public class CartItemController {
 
     private final ICartService cartService;
 
+    private final IUserService userService;
+
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addItemToCart(@RequestParam Integer cartId,
-                                                     @RequestParam Integer productId,
-                                                     @RequestParam Integer quantity) {
+    public ResponseEntity<ApiResponse> addItemToCart(@RequestParam Integer productId, @RequestParam Integer quantity) {
         try {
-            if(cartId==-1)
-                cartId = cartService.initializeNewCart();
-            cartItemService.addCartItem(cartId, productId, quantity);
+            User user = userService.getUserById(1);
+            Cart cart = cartService.initializeNewCart(user);
+            cartItemService.addCartItem(cart.getId(), productId, quantity);
+            return ResponseEntity.ok(new ApiResponse("Item added to cart successfully", cart));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(" ", e.getMessage()));
         }
-        return ResponseEntity.ok(new ApiResponse("Item added to cart successfully", cartService.getCartById(cartId)));
     }
 
     @DeleteMapping("/delete")

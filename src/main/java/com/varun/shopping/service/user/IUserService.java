@@ -1,5 +1,6 @@
 package com.varun.shopping.service.user;
 
+import com.varun.shopping.dto.UserDto;
 import com.varun.shopping.model.User;
 import com.varun.shopping.request.CreateUserRequest;
 import com.varun.shopping.request.UpdateUserRequest;
@@ -14,5 +15,5 @@ public interface IUserService {
 
     void deleteUserById(Integer userId);
 
-
+    UserDto mapUserToUserDto(User user);
 }

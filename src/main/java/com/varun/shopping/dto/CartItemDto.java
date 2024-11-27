@@ -1,18 +1,19 @@
 package com.varun.shopping.dto;
 
+
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class OrderItemDto {
+public class CartItemDto {
 
-    private Integer id;
+    private Integer cartItemId;
 
-    private String productName;
-
-    private int quantity;
+    private Integer quantity;
 
     private BigDecimal unitPrice;
+
+    private ProductDto product;
 
 }

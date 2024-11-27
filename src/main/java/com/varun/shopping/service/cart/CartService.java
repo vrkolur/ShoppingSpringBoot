@@ -1,15 +1,19 @@
 package com.varun.shopping.service.cart;
 
+import com.varun.shopping.dto.CartDto;
 import com.varun.shopping.exception.ResourceNotFoundException;
 import com.varun.shopping.model.Cart;
+import com.varun.shopping.model.User;
 import com.varun.shopping.repository.CartItemRepository;
 import com.varun.shopping.repository.CartRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -22,6 +26,8 @@ public class CartService implements ICartService {
 
     private final AtomicInteger cartIdGenerator = new AtomicInteger(0);
 
+    private final ModelMapper modelMapper;
+
     @Override
     public Cart getCartById(Integer id) {
         Cart cart = cartRepository.findById(id)
@@ -31,9 +37,9 @@ public class CartService implements ICartService {
 
     @Override
     public Cart getCartByUserId(Integer userId) {
-        Cart cart  = cartRepository.findByUserId(userId);
-        if(cart!=null) return cart;
-        else throw  new ResourceNotFoundException("Cart not found with userId: " + userId);
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart != null) return cart;
+        else throw new ResourceNotFoundException("Cart not found with userId: " + userId);
     }
 
     @Override
@@ -55,10 +61,17 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public Integer initializeNewCart() {
-        Cart cart = new Cart();
-        cart.setId(cartIdGenerator.incrementAndGet());
-        cartRepository.save(cart);
-        return cart.getId();
+    public Cart initializeNewCart(User user) {
+        return Optional.ofNullable(cartRepository.findByUserId(user.getId()))
+                .orElseGet(() -> {
+                    Cart cart = new Cart();
+                    cart.setUser(user);
+                    return cartRepository.save(cart);
+                });
+    }
+
+    @Override
+    public CartDto mapCartToCartDto(Cart cart) {
+        return modelMapper.map(cart, CartDto.class);
     }
 }
